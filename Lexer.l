@@ -14,6 +14,7 @@ LOOP 		[l|L][o|O][o|O][p|P]
 #include <stdlib.h>
 #include <string.h>
 #include "y.tab.h"
+#include <ctype.h>
 
 %}
 
@@ -40,7 +41,10 @@ LOOP 		[l|L][o|O][o|O][p|P]
 {SHOWS}				{ return SHOWS; }
 {CMP}				{ return CMP; }
 {LOOP}				{ return LOOP; }
-{VAR}"aa"			{ return AA; }
+{VAR}[A-Z|a-z][A-Z|a-z] {
+  yylval.l = ((toupper(yytext[1]) - 65) * 26) +  (toupper(yytext[2]) - 65);
+  return REG;
+}
 "exit"				{ return EXIT; }
 {C}+				{ return STR; }
 .                   { }
