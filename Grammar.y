@@ -40,8 +40,7 @@ input: %empty
 line:
 '\n'
 | exp '\n'          { acc = $1; printf("= %.10g\n", $1); }
-| command1 '\n'     { acc = $1; printf("= %.10g\n", $1); }
-| command2 '\n'     { }
+| command '\n'     { acc = $1; printf("= %.10g\n", $1); }
 
 num:
 DEC                 { $$ = $1; }
@@ -57,27 +56,25 @@ num                 { $$ = $1; }
 | num '%' num       { $$ = fmod ($1, $3); }
 | '(' num ')'       { $$ = $2; }
 
-command1:
+command:
 show
+| showh
+| shows
 | CMP cmp           { $$ = $2; }
 | LOOP loop         { $$ = $2; }
-| reg '=' num       { tmp1 = $1; tmp2 = $3; var[tmp1 - 258] = tmp2; $$ = tmp2; }
-
-command2:
-showh               { }
-| shows
+| REG '=' num       { var[$1] = $2 }
 
 show:
-SHOW '(' reg ')'    { tmp1 = $3; $$ = var[tmp1 - 258]; }
+SHOW '(' reg ')'    {  }
 
 showh:
 SHOWH '(' reg ')'   { tmp1 = $3; $$ = var[tmp1 - 258]; }
 
 shows:
-SHOWH
+SHOWS
 
 cmp:
-'(' num ',' num ')'               { tmp1 = $2; tmp2 = $4; $$ = compare(tmp1, tmp2); }
+'(' num ',' num ')'               { $$ = compare($2, $4); }
 
 loop:
 //'(' num ',' num ',' inc ')'       {}
@@ -94,6 +91,8 @@ int compare(int n1, int n2){
 int main (void)
 {
   int i;
+  FILE *fp = fopen("test.s","wb+");
+
   for(i = 0; i < 676; i++){
     var[i] = 0;
   }
