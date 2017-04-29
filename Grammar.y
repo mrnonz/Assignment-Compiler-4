@@ -13,7 +13,7 @@
 %}
 /* Bison declarations.  */
 
-%token AA
+%token REG
 %token SHOW
 %token SHOWH
 %token SHOWS
@@ -46,10 +46,7 @@ line:
 num:
 DEC                 { $$ = $1; }
 | HEX               { $$ = $1; }
-| reg               { tmp1 = $1; $$ = var[tmp1 - 258]; }
-
-reg :
-AA                  { tmp1 = AA; $$ = tmp1; }
+| REG               { $$ = var[$1]; }
 
 exp:
 num                 { $$ = $1; }
