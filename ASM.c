@@ -8,6 +8,8 @@ char* getShowCode(int);
 char* getShowHead();
 char* getShowHexCode(int);
 char* getShowHexHead();
+char* getShowStringCode();
+char* getShowStringHead(char*);
 char* asmConcat(char*,char*);
 
 int HeaderNum = 0;
@@ -16,11 +18,8 @@ void main(){
   char* asmHeader;
   char* asmCode;
 
-  asmCode = getShowCode(10);
-  asmHeader = getShowHead();
-
-  asmCode = asmConcat(asmCode,getShowHexCode(50));
-  asmHeader = asmConcat(asmHeader,getShowHexHead());
+  asmCode = getShowStringCode();
+  asmHeader = getShowStringHead("Hello World");
 
   asmHeader = asmConcat(asmHeader,getMain());
   asmCode = asmConcat(asmCode,getTail());
@@ -86,6 +85,29 @@ char* getShowHexHead(){
   asmString = asmConcat(asmString,tmp);
   asmString = asmConcat(asmString,":\n");
   asmString = asmConcat(asmString,"\t.ascii \"0x%02x\\12\\0\"\n");
+  HeaderNum++;
+  return asmString;
+}
+
+char* getShowStringCode(){
+  char tmp[10];
+  sprintf(tmp, "%d", HeaderNum);
+  char* asmString = "\tmovl	$LC";
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,", (%esp)\n");
+  asmString = asmConcat(asmString,"\tcall	_puts\n");
+  return asmString;
+}
+
+char* getShowStringHead(char* str){
+  char tmp[10];
+  sprintf(tmp, "%d", HeaderNum);
+  char* asmString = "LC";
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,":\n");
+  asmString = asmConcat(asmString,"\t.ascii \"");
+  asmString = asmConcat(asmString,str);
+  asmString = asmConcat(asmString,"\\0\"\n");
   HeaderNum++;
   return asmString;
 }
