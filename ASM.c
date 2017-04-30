@@ -4,6 +4,7 @@
 
 char* getMain();
 char* getTail();
+char* getAssign(int,int);
 char* getShowCode(int);
 char* getShowHead();
 char* getShowHexCode(int);
@@ -15,11 +16,18 @@ char* asmConcat(char*,char*);
 int HeaderNum = 0;
 
 void main(){
-  char* asmHeader;
-  char* asmCode;
+  char* asmHeader = "";
+  char* asmCode = "";
 
-  asmCode = getShowStringCode();
-  asmHeader = getShowStringHead("Hello World");
+  asmCode = asmConcat(asmCode, getAssign(1,1));
+  asmCode = asmConcat(asmCode, getAssign(10,500));
+  asmCode = asmConcat(asmCode, getAssign(480,675));
+
+  asmCode = asmConcat(asmCode, getShowCode(10));
+  asmHeader = asmConcat(asmHeader, getShowHead());
+
+  asmCode = asmConcat(asmCode, getShowHexCode(480));
+  asmHeader = asmConcat(asmHeader, getShowHexHead());
 
   asmHeader = asmConcat(asmHeader,getMain());
   asmCode = asmConcat(asmCode,getTail());
@@ -35,13 +43,24 @@ char* asmConcat(char* base,char* cc){
   return tmpStr;
 }
 
-char* getShowCode(int val){
+char* getAssign(int offset, int val){
   char tmp[10];
   sprintf(tmp, "%d", val);
-  char* asmString = "\tmovl	$";
+  char* asmString = "\tmovl $";
   asmString = asmConcat(asmString,tmp);
-  asmString = asmConcat(asmString,", 28(%esp)\n");
-  asmString = asmConcat(asmString,"\tmovl	28(%esp), %eax\n");
+  asmString = asmConcat(asmString,", ");
+  sprintf(tmp, "%d", 100 + offset * 4);
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,"(%esp)\n");
+  return asmString;
+}
+
+char* getShowCode(int offset){
+  char tmp[10];
+  sprintf(tmp, "%d", 100 + offset * 4);
+  char* asmString = "\tmovl	";
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,"(%esp), %eax\n");
   asmString = asmConcat(asmString,"\tmovl	%eax, 4(%esp)\n");
   asmString = asmConcat(asmString,"\tmovl	$LC");
   sprintf(tmp, "%d", HeaderNum);
@@ -62,13 +81,12 @@ char* getShowHead(){
   return asmString;
 }
 
-char* getShowHexCode(int val){
+char* getShowHexCode(int offset){
   char tmp[10];
-  sprintf(tmp, "%d", val);
-  char* asmString = "\tmovl	$";
+  sprintf(tmp, "%d", 100 + offset * 4);
+  char* asmString = "\tmovl	";
   asmString = asmConcat(asmString,tmp);
-  asmString = asmConcat(asmString,", 28(%esp)\n");
-  asmString = asmConcat(asmString,"\tmovl	28(%esp), %eax\n");
+  asmString = asmConcat(asmString,"(%esp), %eax\n");
   asmString = asmConcat(asmString,"\tmovl	%eax, 4(%esp)\n");
   asmString = asmConcat(asmString,"\tmovl	$LC");
   sprintf(tmp, "%d", HeaderNum);
@@ -125,7 +143,7 @@ char* getMain(){
   asmString = asmConcat(asmString,"\tmovl	%esp, %ebp\n");
   asmString = asmConcat(asmString,"\t.cfi_def_cfa_register 5\n");
   asmString = asmConcat(asmString,"\tandl	$-16, %esp\n");
-  asmString = asmConcat(asmString,"\tsubl	$32, %esp\n");
+  asmString = asmConcat(asmString,"\tsubl	$2804, %esp\n");
   asmString = asmConcat(asmString,"\tcall	___main\n");
   return asmString;
 }
