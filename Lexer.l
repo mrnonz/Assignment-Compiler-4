@@ -15,27 +15,32 @@ LOOP 		[l|L][o|O][o|O][p|P]
 #include <string.h>
 #include "Grammar.tab.h"
 #include <ctype.h>
-#define yyterminate() return token ::END
 
 %}
 
 %%
+
+<<EOF>>     {return ENDOFFILE;}
+
 "\n"				{ return '\n'; }
 " "					{ }
 "\t"				{ }
 
+";"			{ return ';'; }
 "+"					{ return '+'; }
 "-"					{ return '-'; }
 "*"					{ return '*'; }
 "/"					{ return '/'; }
 "("					{ return '('; }
 ")"					{ return ')'; }
+"{"         { return '{'; }
+"}"         { return '}'; }
 "\\"				{ return '\\'; }
 "^"					{ return '^'; }
 ","					{ return ','; }
 "="					{ return '='; }
 
-<<EOF>>     {return ENDOFFILE;}
+
 {DEC}+				{ yylval.l = atoi(yytext);					return DEC; }
 {HEX1}{HEX2}+		{ yylval.l = (int)strtol(yytext, NULL, 16);  	return HEX; }
 {SHOW}				{ return SHOW; }

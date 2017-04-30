@@ -28,7 +28,7 @@
 %type <l> REG
 /* Bison declarations.  */
 
-%token ENDOFFILE
+
 %token REG
 %token SHOW
 %token SHOWH
@@ -39,37 +39,34 @@
 %token HEX
 %token EXIT
 %token STR
+%token ENDOFFILE
 
 %left '-' '+'
-%left '*' '/' '\\'
+%left '*' '/'
 %precedence NEG   /* negation--unary minus */
 %right '^'        /* exponentiation */
 
 
 
 %% /* The grammar follows.  */
-input:
-  %empty
-  | input line  { }
-  | ENDOFFILE {printf("g"); return;}
-;
+file: '{''\n' input '}'	{ return;}
+	;
 
-line:
- %empty
-| exp '\n'          { printf("c"); }
-| exp ENDOFFILE    {printf("d");return;}
+input: line input
+  	| %empty
+  	;
 
-;
+line: '\n'
+  	| exp ';'
+  	;
 
 exp:
 val                 {printf("b"); $$ = $1; }
 | exp '+' exp       {
-  printf("f");
   asmCode = asmConcat(asmCode,getSetValue($1,1));
   asmCode = asmConcat(asmCode,getSetValue($3,2));
   asmCode = asmConcat(asmCode,getAdd());
-
-  $$ = $1;
+  $$ = "%eax";
 }
 | exp '-' exp       {  }
 | exp '*' exp       {  }
