@@ -58,18 +58,29 @@ input: line input
 
 line: '\n'
   	| exp ';'
+    | command ';'
   	;
 
 exp:
-val                 {printf("b"); $$ = $1; }
+val                 { $$ = $1; }
 | exp '+' exp       {
   asmCode = asmConcat(asmCode,getSetValue($1,1));
   asmCode = asmConcat(asmCode,getSetValue($3,2));
   asmCode = asmConcat(asmCode,getAdd());
   $$ = "%eax";
 }
-| exp '-' exp       {  }
-| exp '*' exp       {  }
+| exp '-' exp       {
+  asmCode = asmConcat(asmCode,getSetValue($1,1));
+  asmCode = asmConcat(asmCode,getSetValue($3,2));
+  asmCode = asmConcat(asmCode,getSub());
+  $$ = "%eax";
+}
+| exp '*' exp       {
+  asmCode = asmConcat(asmCode,getSetValue($1,1));
+  asmCode = asmConcat(asmCode,getSetValue($3,2));
+  asmCode = asmConcat(asmCode,getMul());
+  $$ = "%eax";
+}
 | exp '/' exp       {  }
 | exp '%' exp       {  }
 | '(' exp ')'       {  }
@@ -90,24 +101,34 @@ DEC                 {
 | REG               {
   char* tmp;
   sprintf(tmp,"%d(%esp)", 100 + $1 * 4);
+  printf("b");
   $$ = tmp;
 }
 ;
 
-/*
+
 command:
 show
+| REG '=' exp       {
+  printf("H");
+  asmCode = asmConcat(asmCode, getAssign($1,$3));
+}
+/*
 | showh
 | shows
 | CMP cmp           {  }
 | LOOP loop         {  }
-| REG '=' exp       { }
+*/
 ;
 
 show:
+SHOW '(' REG ')'  {
+  asmCode = asmConcat(asmCode,getShowCode($3));
+  asmHead = asmConcat(asmHead,getShowHead());
+}
 ;
 
-
+/*
 showh:
 ;
 
@@ -139,9 +160,8 @@ int main (void)
   FILE *fp = fopen("test.s","wb+");
 
   yyparse ();
-
-  printf("%s \nEND",asmHead);
+  asmHead = asmConcat(asmHead,getMain());
+  asmCode = asmConcat(asmCode,getTail());
   fputs(asmHead,fp);
   fputs(asmCode,fp);
-
 }

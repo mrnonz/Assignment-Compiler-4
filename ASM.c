@@ -4,7 +4,7 @@
 
 char* getMain();
 char* getTail();
-char* getAssign(int,int);
+char* getAssign(int,char*);
 char* getShowCode(int);
 char* getShowHead();
 char* getShowHexCode(int);
@@ -13,6 +13,8 @@ char* getShowStringCode();
 char* getShowStringHead(char*);
 char* getSetValue(char*,int);
 char* getAdd();
+char* getSub();
+char* getMul();
 char* asmConcat(char*,char*);
 
 int HeaderNum = 0;
@@ -26,12 +28,12 @@ char* asmConcat(char* base,char* cc){
   return tmpStr;
 }
 
-char* getAssign(int offset, int val){
+char* getAssign(int offset, char* val){
   char tmp[10];
-  sprintf(tmp, "%d", val);
-  char* asmString = "\tmovl $";
-  asmString = asmConcat(asmString,tmp);
-  asmString = asmConcat(asmString,", ");
+  char* asmString = "\tmovl ";
+  asmString = asmConcat(asmString,val);
+  asmString = asmConcat(asmString,", %eax\n");
+  asmString = asmConcat(asmString, "\tmovl %eax, ");
   sprintf(tmp, "%d", 100 + offset * 4);
   asmString = asmConcat(asmString,tmp);
   asmString = asmConcat(asmString,"(%esp)\n");
@@ -155,5 +157,15 @@ char* getSetValue(char* val, int i){
 
 char* getAdd(){
   char* asmString = "\taddl	%edx, %eax\n";
+  return asmString;
+}
+
+char* getSub(){
+  char* asmString = "\tsubl	%edx, %eax\n";
+  return asmString;
+}
+
+char* getMul(){
+  char* asmString = "\timul	%edx, %eax\n";
   return asmString;
 }
