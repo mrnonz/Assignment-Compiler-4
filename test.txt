@@ -1,0 +1,4 @@
+{
+var#ab=8*8+9;
+show(var#ab);
+}

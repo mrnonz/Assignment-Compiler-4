@@ -13,7 +13,7 @@
   char* asmHead="";
   char* asmCode="";
   int compare(int n1, int n2);
-
+  char temp[10][100];
 %}
 
 %union {
@@ -41,6 +41,7 @@
 %token STR
 %token ENDOFFILE
 
+%left '='
 %left '-' '+'
 %left '*' '/'
 %precedence NEG   /* negation--unary minus */
@@ -64,6 +65,7 @@ line: '\n'
 exp:
 val                 { $$ = $1; }
 | exp '+' exp       {
+  printf("%s %s",$1,$3);
   asmCode = asmConcat(asmCode,getSetValue($1,1));
   asmCode = asmConcat(asmCode,getSetValue($3,2));
   asmCode = asmConcat(asmCode,getAdd());
@@ -90,19 +92,21 @@ val:
 DEC                 {
   char* tmp;
   sprintf(tmp,"$%d",$1);
-  printf("a");
-  $$ = tmp;
+  printf("%sa\n",tmp);
+  $$ = "";
+  $$ = asmConcat($$,tmp);
 }
 | HEX               {
   char* tmp;
   sprintf(tmp,"$%d",$1);
-  $$ = tmp;
+  $$ = "";
+  $$ = asmConcat($$,tmp);
 }
 | REG               {
   char* tmp;
   sprintf(tmp,"%d(%esp)", 100 + $1 * 4);
-  printf("b");
-  $$ = tmp;
+  $$ = "";
+  $$ = asmConcat($$,tmp);
 }
 ;
 
