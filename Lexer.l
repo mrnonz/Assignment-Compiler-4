@@ -13,8 +13,9 @@ LOOP 		[l|L][o|O][o|O][p|P]
 
 #include <stdlib.h>
 #include <string.h>
-#include "y.tab.h"
+#include "Grammar.tab.h"
 #include <ctype.h>
+#define yyterminate() return token ::END
 
 %}
 
@@ -34,8 +35,9 @@ LOOP 		[l|L][o|O][o|O][p|P]
 ","					{ return ','; }
 "="					{ return '='; }
 
-{DEC}+				{ yylval = atoi(yytext);					return DEC; }
-{HEX1}{HEX2}+		{ yylval = (int)strtol(yytext, NULL, 16);  	return HEX; }
+<<EOF>>     {return ENDOFFILE;}
+{DEC}+				{ yylval.l = atoi(yytext);					return DEC; }
+{HEX1}{HEX2}+		{ yylval.l = (int)strtol(yytext, NULL, 16);  	return HEX; }
 {SHOW}				{ return SHOW; }
 {SHOWH}				{ return SHOWH; }
 {SHOWS}				{ return SHOWS; }

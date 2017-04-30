@@ -2,17 +2,33 @@
 
   #include <math.h>
   #include <stdio.h>
+  #include <ctype.h>
+  #include "ASM.c"
   int yylex (void);
 
   int tmp1;
   int tmp2;
   int acc;
-  int var[676];
+
+  char* asmHead="";
+  char* asmCode="";
   int compare(int n1, int n2);
 
 %}
+
+%union {
+   char* str;
+   int l;
+}
+
+%type <str> val
+%type <str> exp
+%type <l> DEC
+%type <l> HEX
+%type <l> REG
 /* Bison declarations.  */
 
+%token ENDOFFILE
 %token REG
 %token SHOW
 %token SHOWH
@@ -23,7 +39,7 @@
 %token HEX
 %token EXIT
 %token STR
-%define api.value.type {double}
+
 %left '-' '+'
 %left '*' '/' '\\'
 %precedence NEG   /* negation--unary minus */
@@ -32,72 +48,103 @@
 
 
 %% /* The grammar follows.  */
-input: %empty
-  | input line  { printf ("> "); }
-  | error       { yyerror(); }
-  ;
+input:
+  %empty
+  | input line  { }
+  | ENDOFFILE {printf("g"); return;}
+;
 
 line:
-'\n'
-| exp '\n'          { acc = $1; printf("= %.10g\n", $1); }
-| command '\n'     { acc = $1; printf("= %.10g\n", $1); }
+ %empty
+| exp '\n'          { printf("c"); }
+| exp ENDOFFILE    {printf("d");return;}
 
-num:
-DEC                 { $$ = $1; }
-| HEX               { $$ = $1; }
-| REG               { $$ = var[$1]; }
+;
 
 exp:
-num                 { $$ = $1; }
-| num '+' num       { $$ = $1 + $3; }
-| num '-' num       { $$ = $1 - $3; }
-| num '*' num       { $$ = $1 * $3; }
-| num '/' num       { $$ = $1 / $3; }
-| num '%' num       { $$ = fmod ($1, $3); }
-| '(' num ')'       { $$ = $2; }
+val                 {printf("b"); $$ = $1; }
+| exp '+' exp       {
+  printf("f");
+  asmCode = asmConcat(asmCode,getSetValue($1,1));
+  asmCode = asmConcat(asmCode,getSetValue($3,2));
+  asmCode = asmConcat(asmCode,getAdd());
 
+  $$ = $1;
+}
+| exp '-' exp       {  }
+| exp '*' exp       {  }
+| exp '/' exp       {  }
+| exp '%' exp       {  }
+| '(' exp ')'       {  }
+;
+
+val:
+DEC                 {
+  char* tmp;
+  sprintf(tmp,"$%d",$1);
+  printf("a");
+  $$ = tmp;
+}
+| HEX               {
+  char* tmp;
+  sprintf(tmp,"$%d",$1);
+  $$ = tmp;
+}
+| REG               {
+  char* tmp;
+  sprintf(tmp,"%d(%esp)", 100 + $1 * 4);
+  $$ = tmp;
+}
+;
+
+/*
 command:
 show
 | showh
 | shows
-| CMP cmp           { $$ = $2; }
-| LOOP loop         { $$ = $2; }
-| REG '=' num       { var[$1] = $2 }
+| CMP cmp           {  }
+| LOOP loop         {  }
+| REG '=' exp       { }
+;
 
 show:
-SHOW '(' reg ')'    {  }
+;
+
 
 showh:
-SHOWH '(' reg ')'   { tmp1 = $3; $$ = var[tmp1 - 258]; }
+;
+
 
 shows:
 SHOWS
+;
 
 cmp:
-'(' num ',' num ')'               { $$ = compare($2, $4); }
+'(' exp ',' exp ')'               {  }
+;
 
 loop:
-//'(' num ',' num ',' inc ')'       {}
-
+;
+//'(' exp ',' exp ',' inc ')'       {}
+*/
 %%
 
-#include <ctype.h>
 
+/*
 int compare(int n1, int n2){
   if(n1 != n2) return 0;
   else return 1;
 }
-
+*/
 int main (void)
 {
   int i;
   FILE *fp = fopen("test.s","wb+");
 
-  for(i = 0; i < 676; i++){
-    var[i] = 0;
-  }
-  while(1){
-  	printf("> ");
-  	return yyparse ();
-  }
+  yyparse ();
+
+  printf("%s \nEND",asmHead);
+  fputs(asmHead,fp);
+  fputs(asmCode,fp);
+
 }

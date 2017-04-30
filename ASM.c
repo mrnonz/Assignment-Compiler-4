@@ -11,28 +11,11 @@ char* getShowHexCode(int);
 char* getShowHexHead();
 char* getShowStringCode();
 char* getShowStringHead(char*);
+char* getSetValue(char*,int);
+char* getAdd();
 char* asmConcat(char*,char*);
 
 int HeaderNum = 0;
-
-void main(){
-  char* asmHeader = "";
-  char* asmCode = "";
-
-  asmCode = asmConcat(asmCode, getAssign(1,1));
-  asmCode = asmConcat(asmCode, getAssign(10,500));
-  asmCode = asmConcat(asmCode, getAssign(480,675));
-
-  asmCode = asmConcat(asmCode, getShowCode(10));
-  asmHeader = asmConcat(asmHeader, getShowHead());
-
-  asmCode = asmConcat(asmCode, getShowHexCode(480));
-  asmHeader = asmConcat(asmHeader, getShowHexHead());
-
-  asmHeader = asmConcat(asmHeader,getMain());
-  asmCode = asmConcat(asmCode,getTail());
-  printf("%s\n%s",asmHeader,asmCode);
-}
 
 char* asmConcat(char* base,char* cc){
   char* tmpStr = malloc(strlen(base) + strlen(cc) + 1);
@@ -155,5 +138,22 @@ char* getTail(){
   asmString = asmConcat(asmString,"\t.cfi_def_cfa 4, 4\n");
   asmString = asmConcat(asmString,"\tret\n");
   asmString = asmConcat(asmString,"\t.cfi_endproc\n");
+  return asmString;
+}
+
+char* getSetValue(char* val, int i){
+  char* asmString = "\tmovl	";
+  if(i == 1){
+    asmString = asmConcat(asmString,val);
+    asmString = asmConcat(asmString,", %edx\n");
+  }else{
+    asmString = asmConcat(asmString,val);
+    asmString = asmConcat(asmString,", %eax\n");
+  }
+  return asmString;
+}
+
+char* getAdd(){
+  char* asmString = "\taddl	%edx, %eax\n";
   return asmString;
 }
