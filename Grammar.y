@@ -115,8 +115,9 @@ show
 }
 | showh
 | shows
+| cmp           
+
 /*
-| CMP cmp           {  }
 | LOOP loop         {  }
 */
 ;
@@ -145,15 +146,15 @@ SHOWS '(' ST ')' {
 }
 ;
 
-/*
+
 cmp:
-'(' exp ',' exp ')'               {  }
+CMP '(' val ',' val ')'               {  }
 ;
 
-loop:
-;
-//'(' exp ',' exp ',' inc ')'       {}
-*/
+/*loop:
+;*/
+
+
 %%
 
 
