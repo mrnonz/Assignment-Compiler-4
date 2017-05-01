@@ -100,7 +100,7 @@ DEC                 {
 }
 | REG               {
   char* tmp;
-  sprintf(tmp,"%d(%esp)", 100 + $1 * 4);
+  sprintf(tmp,"%d(%%esp)", 100 + $1 * 4);
   $$ = "";
   $$ = asmConcat($$,tmp);
 }
@@ -148,22 +148,32 @@ SHOWS '(' ST ')' {
 
 
 cmp:
-CMP '(' val ',' val ')'               {  }
+CMP condition statement { printf("After Statement\n");}
 ;
 
+
+condition:
+'(' val ',' val ')' {
+  printf("CMP \n");
+  asmCode = asmConcat(asmCode,getSetValue($2,1));
+  asmCode = asmConcat(asmCode,getSetValue($4,2));
+  asmCode = asmConcat(asmCode,getCmpCode1());
+}
+;
+
+
+statement:
+'{' input '}' {
+  printf("Statement \n");
+  asmCode = asmConcat(asmCode,getCmpCode2());
+}
+;
 /*loop:
 ;*/
 
 
 %%
 
-
-/*
-int compare(int n1, int n2){
-  if(n1 != n2) return 0;
-  else return 1;
-}
-*/
 int main (void)
 {
   int i;

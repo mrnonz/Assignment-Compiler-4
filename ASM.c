@@ -16,8 +16,11 @@ char* getAdd();
 char* getSub();
 char* getMul();
 char* asmConcat(char*,char*);
+char* getCmpCode1();
+char* getCmpCode2();
 
 int HeaderNum = 0;
+int JumpNum = 0;
 
 char* asmConcat(char* base,char* cc){
   char* tmpStr = malloc(strlen(base) + strlen(cc) + 1);
@@ -167,5 +170,26 @@ char* getSub(){
 
 char* getMul(){
   char* asmString = "\timul	%edx, %eax\n";
+  return asmString;
+}
+
+char* getCmpCode1(){
+  char tmp[10];
+  sprintf(tmp, "%d", JumpNum);
+  char* asmString = "\tcmp	";
+  asmString = asmConcat(asmString,"\t%eax, %edx\n");
+  asmString = asmConcat(asmString,"\tjne\t\tnxt");
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,"\n");
+  return asmString;
+}
+
+char* getCmpCode2(){
+  char tmp[10];
+  sprintf(tmp, "%d", JumpNum);
+  char* asmString = "\tnxt";
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,":\n");
+  JumpNum++;
   return asmString;
 }
