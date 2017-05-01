@@ -1,6 +1,6 @@
 {
 var#aa=2;
-loop(1,10,+1){
+loop(1,125,*5){
 show(var#aa);
 };
 }

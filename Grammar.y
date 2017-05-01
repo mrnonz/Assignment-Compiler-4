@@ -180,7 +180,7 @@ conditionLoop:
 | '(' val ',' val ',' '*' val ')' {
   asmCode = asmConcat(asmCode,getSetValue($2,1));
   asmCode = asmConcat(asmCode,getSetValue($4,2));
-  asmCode = asmConcat(asmCode,getLoopCodeAdd($7));
+  asmCode = asmConcat(asmCode,getLoopCodeMultiple($7));
 }
 ;
 
