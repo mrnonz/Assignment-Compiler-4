@@ -15,6 +15,8 @@ char* getSetValue(char*,int);
 char* getAdd();
 char* getSub();
 char* getMul();
+char* getDiv();
+char* getMod();
 char* asmConcat(char*,char*);
 
 int HeaderNum = 0;
@@ -32,8 +34,7 @@ char* getAssign(int offset, char* val){
   char tmp[10];
   char* asmString = "\tmovl ";
   asmString = asmConcat(asmString,val);
-  asmString = asmConcat(asmString,", %eax\n");
-  asmString = asmConcat(asmString, "\tmovl %eax, ");
+  asmString = asmConcat(asmString,", ");
   sprintf(tmp, "%d", 100 + offset * 4);
   asmString = asmConcat(asmString,tmp);
   asmString = asmConcat(asmString,"(%esp)\n");
@@ -167,5 +168,24 @@ char* getSub(){
 
 char* getMul(){
   char* asmString = "\timul	%edx, %eax\n";
+  return asmString;
+}
+
+char* getDiv(){
+  char* asmString = "\tmovl %edx, 28(%esp)\n";
+  asmString = asmConcat(asmString,"\tmovl %eax, 24(%esp)\n");
+  asmString = asmConcat(asmString,"\tmovl	28(%esp), %eax\n");
+  asmString = asmConcat(asmString,"\tcltd\n");
+  asmString = asmConcat(asmString,"\tidivl	24(%esp)\n");
+  return asmString;
+}
+
+char* getMod(){
+  char* asmString = "\tmovl %edx, 28(%esp)\n";
+  asmString = asmConcat(asmString,"\tmovl %eax, 24(%esp)\n");
+  asmString = asmConcat(asmString,"\tmovl	28(%esp), %eax\n");
+  asmString = asmConcat(asmString,"\tcltd\n");
+  asmString = asmConcat(asmString,"\tidivl	24(%esp)\n");
+  asmString = asmConcat(asmString,"\tmovl	%edx, %eax\n");
   return asmString;
 }

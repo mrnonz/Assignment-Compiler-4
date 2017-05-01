@@ -1,0 +1,7 @@
+{
+var#aa=4;
+var#ty=7;
+var#oX=9;
+var#ry=var#aa+var#ty;
+show(var#ry);
+}

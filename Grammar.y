@@ -25,26 +25,11 @@
 %type <l> DEC HEX REG
 /* Bison declarations.  */
 
-
-%token REG
-%token SHOW
-%token SHOWH
-%token SHOWS
-%token CMP
-%token LOOP
-%token DEC
-%token HEX
-%token EXIT
-%token ST
+%token REG SHOW SHOWH SHOWS CMP LOOP DEC HEX ST
 
 %left '='
 %left '-' '+'
-%left '*' '/'
-%precedence NEG   /* negation--unary minus */
-%right '^'        /* exponentiation */
-
-
-
+%left '/' '*'
 %% /* The grammar follows.  */
 file: '{''\n' input '}'	{ return;}
 	;
@@ -68,19 +53,33 @@ val                 { $$ = $1; }
   $$ = "%eax";
 }
 | exp '-' exp       {
+  printf("Sub: %s - %s\n",$1,$3);
   asmCode = asmConcat(asmCode,getSetValue($1,1));
   asmCode = asmConcat(asmCode,getSetValue($3,2));
   asmCode = asmConcat(asmCode,getSub());
   $$ = "%eax";
 }
 | exp '*' exp       {
+  printf("Mul: %s * %s\n",$1,$3);
   asmCode = asmConcat(asmCode,getSetValue($1,1));
   asmCode = asmConcat(asmCode,getSetValue($3,2));
   asmCode = asmConcat(asmCode,getMul());
   $$ = "%eax";
 }
-| exp '/' exp       {  }
-| exp '%' exp       {  }
+| exp '/' exp       {
+  printf("Div: %s / %s\n",$1,$3);
+  asmCode = asmConcat(asmCode,getSetValue($1,1));
+  asmCode = asmConcat(asmCode,getSetValue($3,2));
+  asmCode = asmConcat(asmCode,getDiv());
+  $$ = "%eax";
+}
+| exp '%' exp       {
+  printf("Mod: %s %% %s\n",$1,$3);
+  asmCode = asmConcat(asmCode,getSetValue($1,1));
+  asmCode = asmConcat(asmCode,getSetValue($3,2));
+  asmCode = asmConcat(asmCode,getMod());
+  $$ = "%eax";
+}
 | '(' exp ')'       {  }
 ;
 
@@ -100,7 +99,8 @@ DEC                 {
 }
 | REG               {
   char* tmp;
-  sprintf(tmp,"%d(%esp)", 100 + $1 * 4);
+  sprintf(tmp,"%d(%%esp)", 100 + $1 * 4);
+  printf("REG : %s\n",tmp);
   $$ = "";
   $$ = asmConcat($$,tmp);
 }
@@ -110,7 +110,7 @@ DEC                 {
 command:
 show
 | REG '=' exp       {
-  printf("Assign\n");
+  printf("Assign : %d\n",$1);
   asmCode = asmConcat(asmCode, getAssign($1,$3));
 }
 | showh
@@ -166,7 +166,7 @@ int compare(int n1, int n2){
 int main (void)
 {
   int i;
-  FILE *fp = fopen("test.s","wb+");
+  FILE *fp = fopen("output.s","wb+");
 
   yyparse ();
   asmHead = asmConcat(asmHead,getMain());
