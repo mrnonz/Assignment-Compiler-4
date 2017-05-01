@@ -18,11 +18,15 @@ char* getMul();
 char* getDiv();
 char* getMod();
 char* asmConcat(char*,char*);
-char* getCmpCode1();
-char* getCmpCode2();
+char* getCmpCodeStart();
+char* getCmpCodeEnd();
+char* getLoopCodeAdd(char*);
+char* getLoopCodeEnd();
 
 int HeaderNum = 0;
 int JumpNum = 0;
+int LoopNum = 0;
+int offsetLoop = 80;
 
 char* asmConcat(char* base,char* cc){
   char* tmpStr = malloc(strlen(base) + strlen(cc) + 1);
@@ -193,7 +197,7 @@ char* getMod(){
   return asmString;
 }
 
-char* getCmpCode1(){
+char* getCmpCodeStart(){
   char tmp[10];
   sprintf(tmp, "%d", JumpNum);
   char* asmString = "\tcmp	";
@@ -204,12 +208,49 @@ char* getCmpCode1(){
   return asmString;
 }
 
-char* getCmpCode2(){
+char* getCmpCodeEnd(){
   char tmp[10];
   sprintf(tmp, "%d", JumpNum);
   char* asmString = "\tnxt";
   asmString = asmConcat(asmString,tmp);
   asmString = asmConcat(asmString,":\n");
   JumpNum++;
+  return asmString;
+}
+
+char* getLoopCodeAdd(char* inc){
+  char tmp[10], tmp2[10], tmp3[10];
+  sprintf(tmp, "%d", LoopNum);
+  sprintf(tmp2, "%d", offsetLoop);
+  sprintf(tmp3, "%d", offsetLoop+4);
+  char* asmString = "\tmovl\t%edx,";
+  asmString = asmConcat(asmString,tmp2);
+  asmString = asmConcat(asmString,"(%esp)\n\tmovl\t%eax, ");
+  asmString = asmConcat(asmString,tmp3);
+  asmString = asmConcat(asmString,"(%esp)\n");
+  asmString = asmConcat(asmString,"Loop");
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,":\n");
+  asmString = asmConcat(asmString,"\tmovl 80(%esp), %edx\n");
+  asmString = asmConcat(asmString,"\tmovl 84(%esp), %eax\n");
+  asmString = asmConcat(asmString,"\tcmp\t%eax, %edx\n");
+  asmString = asmConcat(asmString,"\tjg outLoop");
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,"\n\taddl\t");
+  asmString = asmConcat(asmString,inc);
+  asmString = asmConcat(asmString,", %edx\n");
+  asmString = asmConcat(asmString,"\tmovl\t%edx, 80(%esp)\n");
+  asmString = asmConcat(asmString,"\tmovl\t%eax, 84(%esp)\n");
+  return asmString;
+}
+char* getLoopCodeEnd(){
+  char tmp[10];
+  sprintf(tmp, "%d", LoopNum);
+  char* asmString = "\tjmp\tLoop";
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,"\n");
+  asmString = asmConcat(asmString,"outLoop");
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,":\n");
   return asmString;
 }

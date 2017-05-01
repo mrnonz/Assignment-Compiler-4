@@ -5,7 +5,7 @@
   #include <ctype.h>
   #include "ASM.c"
   int yylex (void);
-
+  int yyerror(const char*);
   int tmp1;
   int tmp2;
   int acc;
@@ -30,7 +30,7 @@
 %left '-' '+'
 %left '/' '*' '%'
 %% /* The grammar follows.  */
-file: '{''\n' input '}'	{ return;}
+file: '{''\n' input '}'	{ return 0;}
 	;
 
 input: line input
@@ -117,10 +117,7 @@ show
 | showh
 | shows
 | cmp
-
-/*
-| LOOP loop         {  }
-*/
+| loop
 ;
 
 show:
@@ -149,28 +146,50 @@ SHOWS '(' ST ')' {
 
 
 cmp:
-CMP condition statement { printf("After Statement\n");}
+CMP conditionCmp statementCmp { printf("CMP\n");}
 ;
 
 
-condition:
+conditionCmp:
 '(' val ',' val ')' {
   printf("CMP \n");
   asmCode = asmConcat(asmCode,getSetValue($2,1));
   asmCode = asmConcat(asmCode,getSetValue($4,2));
-  asmCode = asmConcat(asmCode,getCmpCode1());
+  asmCode = asmConcat(asmCode,getCmpCodeStart());
 }
 ;
 
 
-statement:
+statementCmp:
 '{' input '}' {
-  printf("Statement \n");
-  asmCode = asmConcat(asmCode,getCmpCode2());
+  asmCode = asmConcat(asmCode,getCmpCodeEnd());
 }
 ;
-/*loop:
-;*/
+
+
+loop:
+LOOP conditionLoop statementLoop  { printf("LOOP\n");}
+
+
+conditionLoop:
+'(' val ',' val ',' '+' val ')' {
+  asmCode = asmConcat(asmCode,getSetValue($2,1));
+  asmCode = asmConcat(asmCode,getSetValue($4,2));
+  asmCode = asmConcat(asmCode,getLoopCodeAdd($7));
+}
+| '(' val ',' val ',' '*' val ')' {
+  asmCode = asmConcat(asmCode,getSetValue($2,1));
+  asmCode = asmConcat(asmCode,getSetValue($4,2));
+  asmCode = asmConcat(asmCode,getLoopCodeAdd($7));
+}
+;
+
+
+statementLoop:
+'{' input '}' {
+  asmCode = asmConcat(asmCode,getLoopCodeEnd());
+}
+;
 
 
 %%

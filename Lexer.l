@@ -63,5 +63,6 @@ int yywrap(void)
 
 int yyerror(void)
 {
-    printf("Syntax Error\n");
+    printf("Syntax_Error\n");
+    return 0;
 }
