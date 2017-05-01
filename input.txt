@@ -1,0 +1,10 @@
+{
+var#aa=2;
+var#ab=5;
+loop(4,1,-3){
+loop(5,1,-1){
+show(var#ab);
+};
+show(var#aa);
+};
+}

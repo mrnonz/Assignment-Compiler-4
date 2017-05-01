@@ -15,9 +15,20 @@ char* getSetValue(char*,int);
 char* getAdd();
 char* getSub();
 char* getMul();
+char* getDiv();
+char* getMod();
 char* asmConcat(char*,char*);
+char* getCmpCodeStart();
+char* getCmpCodeEnd();
+char* getLoopCodeAdd(char*);
+char* getLoopCodeSub(char*);
+char* getLoopCodeMultiple(char*);
+char* getLoopCodeEnd();
 
 int HeaderNum = 0;
+int JumpNum = 0;
+int LoopNum = 0;
+int offsetLoop = 76;
 
 char* asmConcat(char* base,char* cc){
   char* tmpStr = malloc(strlen(base) + strlen(cc) + 1);
@@ -32,8 +43,7 @@ char* getAssign(int offset, char* val){
   char tmp[10];
   char* asmString = "\tmovl ";
   asmString = asmConcat(asmString,val);
-  asmString = asmConcat(asmString,", %eax\n");
-  asmString = asmConcat(asmString, "\tmovl %eax, ");
+  asmString = asmConcat(asmString,", ");
   sprintf(tmp, "%d", 100 + offset * 4);
   asmString = asmConcat(asmString,tmp);
   asmString = asmConcat(asmString,"(%esp)\n");
@@ -167,5 +177,146 @@ char* getSub(){
 
 char* getMul(){
   char* asmString = "\timul	%edx, %eax\n";
+  return asmString;
+}
+
+char* getDiv(){
+  char* asmString = "\tmovl %edx, 28(%esp)\n";
+  asmString = asmConcat(asmString,"\tmovl %eax, 24(%esp)\n");
+  asmString = asmConcat(asmString,"\tmovl	28(%esp), %eax\n");
+  asmString = asmConcat(asmString,"\tcltd\n");
+  asmString = asmConcat(asmString,"\tidivl	24(%esp)\n");
+  return asmString;
+}
+
+char* getMod(){
+  char* asmString = "\tmovl %edx, 28(%esp)\n";
+  asmString = asmConcat(asmString,"\tmovl %eax, 24(%esp)\n");
+  asmString = asmConcat(asmString,"\tmovl	28(%esp), %eax\n");
+  asmString = asmConcat(asmString,"\tcltd\n");
+  asmString = asmConcat(asmString,"\tidivl	24(%esp)\n");
+  asmString = asmConcat(asmString,"\tmovl	%edx, %eax\n");
+  return asmString;
+}
+
+char* getCmpCodeStart(){
+  char tmp[10];
+  sprintf(tmp, "%d", JumpNum);
+  char* asmString = "\tcmp	";
+  asmString = asmConcat(asmString,"\t%eax, %edx\n");
+  asmString = asmConcat(asmString,"\tjne\t\tnxt");
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,"\n");
+  return asmString;
+}
+
+char* getCmpCodeEnd(){
+  char tmp[10];
+  sprintf(tmp, "%d", JumpNum);
+  char* asmString = "\tnxt";
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,":\n");
+  JumpNum++;
+  return asmString;
+}
+
+char* getLoopCodeAdd(char* inc){
+  char tmp[10], tmp2[10], tmp3[10];
+  sprintf(tmp, "%d", LoopNum);
+  sprintf(tmp2, "%d", offsetLoop);
+  sprintf(tmp3, "%d", offsetLoop+4);
+  char* asmString = "\tmovl\t%edx,";
+  asmString = asmConcat(asmString,tmp2);
+  asmString = asmConcat(asmString,"(%esp)\n\tmovl\t%eax, ");
+  asmString = asmConcat(asmString,tmp3);
+  asmString = asmConcat(asmString,"(%esp)\nLoop");
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,":\n\tmovl ");
+  asmString = asmConcat(asmString,tmp2);
+  asmString = asmConcat(asmString,"(%esp), %edx\n\tmovl ");
+  asmString = asmConcat(asmString,tmp3);
+  asmString = asmConcat(asmString,"(%esp), %eax\n\tcmp\t%eax, %edx\n\tjg outLoop");
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,"\n\taddl\t");
+  asmString = asmConcat(asmString,inc);
+  asmString = asmConcat(asmString,", %edx\n\tmovl\t%edx, ");
+  asmString = asmConcat(asmString,tmp2);
+  asmString = asmConcat(asmString,"(%esp)\n\tmovl\t%eax, ");
+  asmString = asmConcat(asmString,tmp3);
+  asmString = asmConcat(asmString,"(%esp)\n");
+  offsetLoop += 8;
+  LoopNum++;
+  return asmString;
+}
+
+char* getLoopCodeMultiple(char* inc){
+  char tmp[10], tmp2[10], tmp3[10];
+  sprintf(tmp, "%d", LoopNum);
+  sprintf(tmp2, "%d", offsetLoop);
+  sprintf(tmp3, "%d", offsetLoop+4);
+  char* asmString = "\tmovl\t%edx,";
+  asmString = asmConcat(asmString,tmp2);
+  asmString = asmConcat(asmString,"(%esp)\n\tmovl\t%eax, ");
+  asmString = asmConcat(asmString,tmp3);
+  asmString = asmConcat(asmString,"(%esp)\nLoop");
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,":\n\tmovl ");
+  asmString = asmConcat(asmString,tmp2);
+  asmString = asmConcat(asmString,"(%esp), %edx\n\tmovl ");
+  asmString = asmConcat(asmString,tmp3);
+  asmString = asmConcat(asmString,"(%esp), %eax\n\tcmp\t%eax, %edx\n\tjg outLoop");
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,"\n\timul\t");
+  asmString = asmConcat(asmString,inc);
+  asmString = asmConcat(asmString,", %edx\n\tmovl\t%edx, ");
+  asmString = asmConcat(asmString,tmp2);
+  asmString = asmConcat(asmString,"(%esp)\n\tmovl\t%eax, ");
+  asmString = asmConcat(asmString,tmp3);
+  asmString = asmConcat(asmString,"(%esp)\n");
+  offsetLoop += 8;
+  LoopNum++;
+  return asmString;
+}
+
+char* getLoopCodeSub(char* inc){
+  char tmp[10], tmp2[10], tmp3[10];
+  sprintf(tmp, "%d", LoopNum);
+  sprintf(tmp2, "%d", offsetLoop);
+  sprintf(tmp3, "%d", offsetLoop+4);
+  char* asmString = "\tmovl\t%edx,";
+  asmString = asmConcat(asmString,tmp2);
+  asmString = asmConcat(asmString,"(%esp)\n\tmovl\t%eax, ");
+  asmString = asmConcat(asmString,tmp3);
+  asmString = asmConcat(asmString,"(%esp)\nLoop");
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,":\n\tmovl ");
+  asmString = asmConcat(asmString,tmp2);
+  asmString = asmConcat(asmString,"(%esp), %edx\n\tmovl ");
+  asmString = asmConcat(asmString,tmp3);
+  asmString = asmConcat(asmString,"(%esp), %eax\n\tcmp\t%eax, %edx\n\tjl outLoop");
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,"\n\tsubl\t");
+  asmString = asmConcat(asmString,inc);
+  asmString = asmConcat(asmString,", %edx\n\tmovl\t%edx, ");
+  asmString = asmConcat(asmString,tmp2);
+  asmString = asmConcat(asmString,"(%esp)\n\tmovl\t%eax, ");
+  asmString = asmConcat(asmString,tmp3);
+  asmString = asmConcat(asmString,"(%esp)\n");
+  offsetLoop += 8;
+  LoopNum++;
+  return asmString;
+}
+
+char* getLoopCodeEnd(){
+  char tmp[10];
+  offsetLoop -= 8;
+  LoopNum--;
+  sprintf(tmp, "%d", LoopNum);
+  char* asmString = "\tjmp\tLoop";
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,"\n");
+  asmString = asmConcat(asmString,"outLoop");
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,":\n");
   return asmString;
 }

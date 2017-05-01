@@ -5,7 +5,7 @@
   #include <ctype.h>
   #include "ASM.c"
   int yylex (void);
-
+  int yyerror(const char*);
   int tmp1;
   int tmp2;
   int acc;
@@ -25,28 +25,12 @@
 %type <l> DEC HEX REG
 /* Bison declarations.  */
 
-
-%token REG
-%token SHOW
-%token SHOWH
-%token SHOWS
-%token CMP
-%token LOOP
-%token DEC
-%token HEX
-%token EXIT
-%token ST
-
+%token REG SHOW SHOWH SHOWS CMP LOOP DEC HEX ST
 %left '='
 %left '-' '+'
-%left '*' '/'
-%precedence NEG   /* negation--unary minus */
-%right '^'        /* exponentiation */
-
-
-
+%left '/' '*' '%'
 %% /* The grammar follows.  */
-file: '{''\n' input '}'	{ return;}
+file: '{''\n' input '}'	{ return 0;}
 	;
 
 input: line input
@@ -68,20 +52,36 @@ val                 { $$ = $1; }
   $$ = "%eax";
 }
 | exp '-' exp       {
+  printf("Sub: %s - %s\n",$1,$3);
   asmCode = asmConcat(asmCode,getSetValue($1,1));
   asmCode = asmConcat(asmCode,getSetValue($3,2));
   asmCode = asmConcat(asmCode,getSub());
   $$ = "%eax";
 }
 | exp '*' exp       {
+  printf("Mul: %s * %s\n",$1,$3);
   asmCode = asmConcat(asmCode,getSetValue($1,1));
   asmCode = asmConcat(asmCode,getSetValue($3,2));
   asmCode = asmConcat(asmCode,getMul());
   $$ = "%eax";
 }
-| exp '/' exp       {  }
-| exp '%' exp       {  }
-| '(' exp ')'       {  }
+| exp '/' exp       {
+  printf("Div: %s / %s\n",$1,$3);
+  asmCode = asmConcat(asmCode,getSetValue($1,1));
+  asmCode = asmConcat(asmCode,getSetValue($3,2));
+  asmCode = asmConcat(asmCode,getDiv());
+  $$ = "%eax";
+}
+| exp '%' exp       {
+  printf("Mod: %s %% %s\n",$1,$3);
+  asmCode = asmConcat(asmCode,getSetValue($1,1));
+  asmCode = asmConcat(asmCode,getSetValue($3,2));
+  asmCode = asmConcat(asmCode,getMod());
+  $$ = "%eax";
+}
+| '(' exp ')'       {
+  $$ = "%eax";
+ }
 ;
 
 val:
@@ -100,7 +100,8 @@ DEC                 {
 }
 | REG               {
   char* tmp;
-  sprintf(tmp,"%d(%esp)", 100 + $1 * 4);
+  sprintf(tmp,"%d(%%esp)", 100 + $1 * 4);
+  printf("REG : %s\n",tmp);
   $$ = "";
   $$ = asmConcat($$,tmp);
 }
@@ -110,15 +111,13 @@ DEC                 {
 command:
 show
 | REG '=' exp       {
-  printf("Assign\n");
+  printf("Assign : %d\n",$1);
   asmCode = asmConcat(asmCode, getAssign($1,$3));
 }
 | showh
 | shows
-/*
-| CMP cmp           {  }
-| LOOP loop         {  }
-*/
+| cmp
+| loop
 ;
 
 show:
@@ -145,28 +144,65 @@ SHOWS '(' ST ')' {
 }
 ;
 
-/*
+
 cmp:
-'(' exp ',' exp ')'               {  }
+CMP conditionCmp statementCmp { printf("CMP\n");}
 ;
+
+
+conditionCmp:
+'(' val ',' val ')' {
+  printf("CMP \n");
+  asmCode = asmConcat(asmCode,getSetValue($2,1));
+  asmCode = asmConcat(asmCode,getSetValue($4,2));
+  asmCode = asmConcat(asmCode,getCmpCodeStart());
+}
+;
+
+
+statementCmp:
+'{' input '}' {
+  asmCode = asmConcat(asmCode,getCmpCodeEnd());
+}
+;
+
 
 loop:
+LOOP conditionLoop statementLoop  { printf("LOOP\n");}
+
+
+conditionLoop:
+'(' val ',' val ',' '+' val ')' {
+  asmCode = asmConcat(asmCode,getSetValue($2,1));
+  asmCode = asmConcat(asmCode,getSetValue($4,2));
+  asmCode = asmConcat(asmCode,getLoopCodeAdd($7));
+}
+| '(' val ',' val ',' '-' val ')' {
+  asmCode = asmConcat(asmCode,getSetValue($2,1));
+  asmCode = asmConcat(asmCode,getSetValue($4,2));
+  asmCode = asmConcat(asmCode,getLoopCodeSub($7));
+}
+| '(' val ',' val ',' '*' val ')' {
+  asmCode = asmConcat(asmCode,getSetValue($2,1));
+  asmCode = asmConcat(asmCode,getSetValue($4,2));
+  asmCode = asmConcat(asmCode,getLoopCodeMultiple($7));
+}
 ;
-//'(' exp ',' exp ',' inc ')'       {}
-*/
+
+
+statementLoop:
+'{' input '}' {
+  asmCode = asmConcat(asmCode,getLoopCodeEnd());
+}
+;
+
+
 %%
 
-
-/*
-int compare(int n1, int n2){
-  if(n1 != n2) return 0;
-  else return 1;
-}
-*/
 int main (void)
 {
   int i;
-  FILE *fp = fopen("test.s","wb+");
+  FILE *fp = fopen("output.s","wb+");
 
   yyparse ();
   asmHead = asmConcat(asmHead,getMain());

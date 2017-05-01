@@ -39,7 +39,7 @@ LOOP 		[l|L][o|O][o|O][p|P]
 "^"					{ return '^'; }
 ","					{ return ','; }
 "="					{ return '='; }
-
+"%"         { return '%'; }
 {DEC}+				{ yylval.l = atoi(yytext);					return DEC; }
 {HEX1}{HEX2}+		{ yylval.l = (int)strtol(yytext, NULL, 16);  	return HEX; }
 {SHOW}				{ return SHOW; }
@@ -48,7 +48,7 @@ LOOP 		[l|L][o|O][o|O][p|P]
 {CMP}				{ return CMP; }
 {LOOP}				{ return LOOP; }
 {VAR}[A-Z|a-z][A-Z|a-z] {
-  yylval.l = ((toupper(yytext[1]) - 65) * 26) +  (toupper(yytext[2]) - 65);
+  yylval.l = ((toupper(yytext[4]) - 65) * 26) +  (toupper(yytext[5]) - 65);
   return REG;
 }
 
@@ -63,5 +63,6 @@ int yywrap(void)
 
 int yyerror(void)
 {
-    printf("! ERROR\n");
+    printf("Syntax_Error\n");
+    return 0;
 }
