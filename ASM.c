@@ -18,8 +18,11 @@ char* getMul();
 char* getDiv();
 char* getMod();
 char* asmConcat(char*,char*);
+char* getCmpCode1();
+char* getCmpCode2();
 
 int HeaderNum = 0;
+int JumpNum = 0;
 
 char* asmConcat(char* base,char* cc){
   char* tmpStr = malloc(strlen(base) + strlen(cc) + 1);
@@ -171,6 +174,7 @@ char* getMul(){
   return asmString;
 }
 
+<<<<<<< HEAD
 char* getDiv(){
   char* asmString = "\tmovl %edx, 28(%esp)\n";
   asmString = asmConcat(asmString,"\tmovl %eax, 24(%esp)\n");
@@ -189,3 +193,25 @@ char* getMod(){
   asmString = asmConcat(asmString,"\tmovl	%edx, %eax\n");
   return asmString;
 }
+=======
+char* getCmpCode1(){
+  char tmp[10];
+  sprintf(tmp, "%d", JumpNum);
+  char* asmString = "\tcmp	";
+  asmString = asmConcat(asmString,"\t%eax, %edx\n");
+  asmString = asmConcat(asmString,"\tjne\t\tnxt");
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,"\n");
+  return asmString;
+}
+
+char* getCmpCode2(){
+  char tmp[10];
+  sprintf(tmp, "%d", JumpNum);
+  char* asmString = "\tnxt";
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,":\n");
+  JumpNum++;
+  return asmString;
+}
+>>>>>>> origin/paoo

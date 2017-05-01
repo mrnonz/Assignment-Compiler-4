@@ -1,5 +1,13 @@
 {
-var#ab=8+4*14+9;
-show(var#ab);
+var#ab=45;
+cmp(var#ab,45){
+shows(kuy);
+cmp(var#ab,45){
+shows(kuy1);
+};
+cmp(42,45){
+shows(kuy2);
+};
+};
 shows(Hello World);
 }
