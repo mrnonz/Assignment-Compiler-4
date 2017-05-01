@@ -21,6 +21,7 @@ char* asmConcat(char*,char*);
 char* getCmpCodeStart();
 char* getCmpCodeEnd();
 char* getLoopCodeAdd(char*);
+char* getLoopCodeSub(char*);
 char* getLoopCodeMultiple(char*);
 char* getLoopCodeEnd();
 
@@ -266,6 +267,35 @@ char* getLoopCodeMultiple(char* inc){
   asmString = asmConcat(asmString,"(%esp), %eax\n\tcmp\t%eax, %edx\n\tjg outLoop");
   asmString = asmConcat(asmString,tmp);
   asmString = asmConcat(asmString,"\n\timul\t");
+  asmString = asmConcat(asmString,inc);
+  asmString = asmConcat(asmString,", %edx\n\tmovl\t%edx, ");
+  asmString = asmConcat(asmString,tmp2);
+  asmString = asmConcat(asmString,"(%esp)\n\tmovl\t%eax, ");
+  asmString = asmConcat(asmString,tmp3);
+  asmString = asmConcat(asmString,"(%esp)\n");
+  offsetLoop += 8;
+  LoopNum++;
+  return asmString;
+}
+
+char* getLoopCodeSub(char* inc){
+  char tmp[10], tmp2[10], tmp3[10];
+  sprintf(tmp, "%d", LoopNum);
+  sprintf(tmp2, "%d", offsetLoop);
+  sprintf(tmp3, "%d", offsetLoop+4);
+  char* asmString = "\tmovl\t%edx,";
+  asmString = asmConcat(asmString,tmp2);
+  asmString = asmConcat(asmString,"(%esp)\n\tmovl\t%eax, ");
+  asmString = asmConcat(asmString,tmp3);
+  asmString = asmConcat(asmString,"(%esp)\nLoop");
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,":\n\tmovl ");
+  asmString = asmConcat(asmString,tmp2);
+  asmString = asmConcat(asmString,"(%esp), %edx\n\tmovl ");
+  asmString = asmConcat(asmString,tmp3);
+  asmString = asmConcat(asmString,"(%esp), %eax\n\tcmp\t%eax, %edx\n\tjl outLoop");
+  asmString = asmConcat(asmString,tmp);
+  asmString = asmConcat(asmString,"\n\tsubl\t");
   asmString = asmConcat(asmString,inc);
   asmString = asmConcat(asmString,", %edx\n\tmovl\t%edx, ");
   asmString = asmConcat(asmString,tmp2);
