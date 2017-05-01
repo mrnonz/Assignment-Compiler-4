@@ -26,7 +26,7 @@ char* getLoopCodeEnd();
 int HeaderNum = 0;
 int JumpNum = 0;
 int LoopNum = 0;
-int offsetLoop = 80;
+int offsetLoop = 76;
 
 char* asmConcat(char* base,char* cc){
   char* tmpStr = malloc(strlen(base) + strlen(cc) + 1);
@@ -227,24 +227,29 @@ char* getLoopCodeAdd(char* inc){
   asmString = asmConcat(asmString,tmp2);
   asmString = asmConcat(asmString,"(%esp)\n\tmovl\t%eax, ");
   asmString = asmConcat(asmString,tmp3);
-  asmString = asmConcat(asmString,"(%esp)\n");
-  asmString = asmConcat(asmString,"Loop");
+  asmString = asmConcat(asmString,"(%esp)\nLoop");
   asmString = asmConcat(asmString,tmp);
-  asmString = asmConcat(asmString,":\n");
-  asmString = asmConcat(asmString,"\tmovl 80(%esp), %edx\n");
-  asmString = asmConcat(asmString,"\tmovl 84(%esp), %eax\n");
-  asmString = asmConcat(asmString,"\tcmp\t%eax, %edx\n");
-  asmString = asmConcat(asmString,"\tjg outLoop");
+  asmString = asmConcat(asmString,":\n\tmovl ");
+  asmString = asmConcat(asmString,tmp2);
+  asmString = asmConcat(asmString,"(%esp), %edx\n\tmovl ");
+  asmString = asmConcat(asmString,tmp3);
+  asmString = asmConcat(asmString,"(%esp), %eax\n\tcmp\t%eax, %edx\n\tcmp\t%eax, %edx\n\tjg outLoop");
   asmString = asmConcat(asmString,tmp);
   asmString = asmConcat(asmString,"\n\taddl\t");
   asmString = asmConcat(asmString,inc);
-  asmString = asmConcat(asmString,", %edx\n");
-  asmString = asmConcat(asmString,"\tmovl\t%edx, 80(%esp)\n");
-  asmString = asmConcat(asmString,"\tmovl\t%eax, 84(%esp)\n");
+  asmString = asmConcat(asmString,", %edx\n\tmovl\t%edx, ");
+  asmString = asmConcat(asmString,tmp2);
+  asmString = asmConcat(asmString,"(%esp)\n\tmovl\t%eax, ");
+  asmString = asmConcat(asmString,tmp3);
+  asmString = asmConcat(asmString,"(%esp)\n");
+  offsetLoop += 8;
+  LoopNum++;
   return asmString;
 }
 char* getLoopCodeEnd(){
   char tmp[10];
+  offsetLoop -= 8;
+  LoopNum--;
   sprintf(tmp, "%d", LoopNum);
   char* asmString = "\tjmp\tLoop";
   asmString = asmConcat(asmString,tmp);
