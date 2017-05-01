@@ -1,4 +1,4 @@
-C			[0-9a-zA-Z]
+C			[0-9a-zA-Z ]
 DEC 		[0-9]
 HEX1 		[0][x|X]
 HEX2		[0-9a-fA-F]
@@ -20,7 +20,7 @@ LOOP 		[l|L][o|O][o|O][p|P]
 
 %%
 
-<<EOF>>     {return ENDOFFILE;}
+
 
 "\n"				{ return '\n'; }
 " "					{ }
@@ -40,20 +40,19 @@ LOOP 		[l|L][o|O][o|O][p|P]
 ","					{ return ','; }
 "="					{ return '='; }
 
-
 {DEC}+				{ yylval.l = atoi(yytext);					return DEC; }
 {HEX1}{HEX2}+		{ yylval.l = (int)strtol(yytext, NULL, 16);  	return HEX; }
 {SHOW}				{ return SHOW; }
 {SHOWH}				{ return SHOWH; }
-{SHOWS}				{ return SHOWS; }
+{SHOWS}				{ printf("Token : SHOWS\n"); return SHOWS; }
 {CMP}				{ return CMP; }
 {LOOP}				{ return LOOP; }
 {VAR}[A-Z|a-z][A-Z|a-z] {
   yylval.l = ((toupper(yytext[1]) - 65) * 26) +  (toupper(yytext[2]) - 65);
   return REG;
 }
-"exit"				{ return EXIT; }
-{C}+				{ return STR; }
+
+{C}+				{  yylval.str = strdup(yytext); return ST; }
 .                   { }
 %%
 

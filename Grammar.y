@@ -21,11 +21,8 @@
    int l;
 }
 
-%type <str> val
-%type <str> exp
-%type <l> DEC
-%type <l> HEX
-%type <l> REG
+%type <str> val exp ST
+%type <l> DEC HEX REG
 /* Bison declarations.  */
 
 
@@ -38,8 +35,7 @@
 %token DEC
 %token HEX
 %token EXIT
-%token STR
-%token ENDOFFILE
+%token ST
 
 %left '='
 %left '-' '+'
@@ -65,7 +61,7 @@ line: '\n'
 exp:
 val                 { $$ = $1; }
 | exp '+' exp       {
-  printf("%s %s",$1,$3);
+  printf("Plus: %s + %s\n",$1,$3);
   asmCode = asmConcat(asmCode,getSetValue($1,1));
   asmCode = asmConcat(asmCode,getSetValue($3,2));
   asmCode = asmConcat(asmCode,getAdd());
@@ -92,7 +88,7 @@ val:
 DEC                 {
   char* tmp;
   sprintf(tmp,"$%d",$1);
-  printf("%sa\n",tmp);
+  printf("DEC : %s\n",tmp);
   $$ = "";
   $$ = asmConcat($$,tmp);
 }
@@ -114,12 +110,12 @@ DEC                 {
 command:
 show
 | REG '=' exp       {
-  printf("H");
+  printf("Assign\n");
   asmCode = asmConcat(asmCode, getAssign($1,$3));
 }
-/*
 | showh
 | shows
+/*
 | CMP cmp           {  }
 | LOOP loop         {  }
 */
@@ -127,20 +123,29 @@ show
 
 show:
 SHOW '(' REG ')'  {
+  printf("Show\n");
   asmCode = asmConcat(asmCode,getShowCode($3));
   asmHead = asmConcat(asmHead,getShowHead());
 }
 ;
 
-/*
+
 showh:
+SHOWH '(' REG ')' {
+  asmCode = asmConcat(asmCode,getShowHexCode($3));
+  asmHead = asmConcat(asmHead,getShowHexHead());
+}
 ;
 
 
 shows:
-SHOWS
+SHOWS '(' ST ')' {
+  asmCode = asmConcat(asmCode,getShowStringCode());
+  asmHead = asmConcat(asmHead,getShowStringHead($3));
+}
 ;
 
+/*
 cmp:
 '(' exp ',' exp ')'               {  }
 ;

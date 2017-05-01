@@ -54,9 +54,8 @@ extern int yydebug;
     DEC = 264,
     HEX = 265,
     EXIT = 266,
-    STR = 267,
-    ENDOFFILE = 268,
-    NEG = 269
+    ST = 267,
+    NEG = 268
   };
 #endif
 
@@ -70,7 +69,7 @@ union YYSTYPE
    char* str;
    int l;
 
-#line 74 "Grammar.tab.h" /* yacc.c:1909  */
+#line 73 "Grammar.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
