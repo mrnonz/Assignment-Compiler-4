@@ -16,25 +16,20 @@ LFB10:
 	andl	$-16, %esp
 	subl	$2804, %esp
 	call	___main
-	movl	$2, %edx
-	movl	$9, %eax
-	addl	%edx, %eax
-	movl	%eax, %edx
-	movl	$7, %eax
-	addl	%edx, %eax
-	movl	%eax, %edx
-	movl	$2, %eax
-	addl	%edx, %eax
-	movl %eax, 100(%esp)
 	movl	$1, %edx
+	movl	$4, %eax
+	imul	%edx, %eax
+	movl	$1, %edx
+	movl	%edx, %eax
+	addl	%edx, %eax
+	movl	%edx, %edx
 	movl	$1, %eax
-	cmp		%eax, %edx
-	jne		nxt0
+	addl	%edx, %eax
+	movl %edx, 100(%esp)
 	movl	100(%esp), %eax
 	movl	%eax, 4(%esp)
 	movl	$LC0, (%esp)
 	call	_printf
-	nxt0:
 	movl	$LC1, (%esp)
 	call	_puts
 	nop

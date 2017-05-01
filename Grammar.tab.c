@@ -1279,7 +1279,7 @@ yyreduce:
   asmCode = asmConcat(asmCode,getSetValue((yyvsp[-2].str),1));
   asmCode = asmConcat(asmCode,getSetValue((yyvsp[0].str),2));
   asmCode = asmConcat(asmCode,getAdd());
-  (yyval.str) = "%eax";
+  (yyval.str) = "%edx";
 }
 #line 1285 "Grammar.tab.c" /* yacc.c:1646  */
     break;
@@ -1291,7 +1291,7 @@ yyreduce:
   asmCode = asmConcat(asmCode,getSetValue((yyvsp[-2].str),1));
   asmCode = asmConcat(asmCode,getSetValue((yyvsp[0].str),2));
   asmCode = asmConcat(asmCode,getSub());
-  (yyval.str) = "%eax";
+  (yyval.str) = "%edx";
 }
 #line 1297 "Grammar.tab.c" /* yacc.c:1646  */
     break;
@@ -1303,7 +1303,7 @@ yyreduce:
   asmCode = asmConcat(asmCode,getSetValue((yyvsp[-2].str),1));
   asmCode = asmConcat(asmCode,getSetValue((yyvsp[0].str),2));
   asmCode = asmConcat(asmCode,getMul());
-  (yyval.str) = "%eax";
+  (yyval.str) = "%edx";
 }
 #line 1309 "Grammar.tab.c" /* yacc.c:1646  */
     break;
@@ -1315,7 +1315,7 @@ yyreduce:
   asmCode = asmConcat(asmCode,getSetValue((yyvsp[-2].str),1));
   asmCode = asmConcat(asmCode,getSetValue((yyvsp[0].str),2));
   asmCode = asmConcat(asmCode,getDiv());
-  (yyval.str) = "%eax";
+  (yyval.str) = "%edx";
 }
 #line 1321 "Grammar.tab.c" /* yacc.c:1646  */
     break;
@@ -1327,7 +1327,7 @@ yyreduce:
   asmCode = asmConcat(asmCode,getSetValue((yyvsp[-2].str),1));
   asmCode = asmConcat(asmCode,getSetValue((yyvsp[0].str),2));
   asmCode = asmConcat(asmCode,getMod());
-  (yyval.str) = "%eax";
+  (yyval.str) = "%edx";
 }
 #line 1333 "Grammar.tab.c" /* yacc.c:1646  */
     break;

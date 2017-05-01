@@ -1,7 +1,5 @@
 {
-var#aa=2+9+7+2;
-cmp(1,1){
+var#aa=1+1*4+1;
 show(var#Aa);
-};
 shows(Hello world);
 }

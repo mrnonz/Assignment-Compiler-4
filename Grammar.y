@@ -49,35 +49,35 @@ val                 { $$ = $1; }
   asmCode = asmConcat(asmCode,getSetValue($1,1));
   asmCode = asmConcat(asmCode,getSetValue($3,2));
   asmCode = asmConcat(asmCode,getAdd());
-  $$ = "%eax";
+  $$ = "%edx";
 }
 | exp '-' exp       {
   printf("Sub: %s - %s\n",$1,$3);
   asmCode = asmConcat(asmCode,getSetValue($1,1));
   asmCode = asmConcat(asmCode,getSetValue($3,2));
   asmCode = asmConcat(asmCode,getSub());
-  $$ = "%eax";
+  $$ = "%edx";
 }
 | exp '*' exp       {
   printf("Mul: %s * %s\n",$1,$3);
   asmCode = asmConcat(asmCode,getSetValue($1,1));
   asmCode = asmConcat(asmCode,getSetValue($3,2));
   asmCode = asmConcat(asmCode,getMul());
-  $$ = "%eax";
+  $$ = "%edx";
 }
 | exp '/' exp       {
   printf("Div: %s / %s\n",$1,$3);
   asmCode = asmConcat(asmCode,getSetValue($1,1));
   asmCode = asmConcat(asmCode,getSetValue($3,2));
   asmCode = asmConcat(asmCode,getDiv());
-  $$ = "%eax";
+  $$ = "%edx";
 }
 | exp '%' exp       {
   printf("Mod: %s %% %s\n",$1,$3);
   asmCode = asmConcat(asmCode,getSetValue($1,1));
   asmCode = asmConcat(asmCode,getSetValue($3,2));
   asmCode = asmConcat(asmCode,getMod());
-  $$ = "%eax";
+  $$ = "%edx";
 }
 | '(' exp ')'       {
   $$ = "%eax";
