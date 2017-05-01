@@ -26,10 +26,9 @@
 /* Bison declarations.  */
 
 %token REG SHOW SHOWH SHOWS CMP LOOP DEC HEX ST
-
 %left '='
 %left '-' '+'
-%left '/' '*'
+%left '/' '*' '%'
 %% /* The grammar follows.  */
 file: '{''\n' input '}'	{ return;}
 	;
@@ -80,7 +79,9 @@ val                 { $$ = $1; }
   asmCode = asmConcat(asmCode,getMod());
   $$ = "%eax";
 }
-| '(' exp ')'       {  }
+| '(' exp ')'       {
+  $$ = "%eax";
+ }
 ;
 
 val:
