@@ -101,10 +101,7 @@ DEC                 {
 | REG               {
   char* tmp;
   sprintf(tmp,"%d(%%esp)", 100 + $1 * 4);
-<<<<<<< HEAD
   printf("REG : %s\n",tmp);
-=======
->>>>>>> origin/paoo
   $$ = "";
   $$ = asmConcat($$,tmp);
 }
@@ -119,7 +116,7 @@ show
 }
 | showh
 | shows
-| cmp           
+| cmp
 
 /*
 | LOOP loop         {  }

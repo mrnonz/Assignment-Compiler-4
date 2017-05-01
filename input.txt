@@ -1,7 +1,7 @@
 {
-var#aa=4;
-var#ty=7;
-var#oX=9;
-var#ry=var#aa+var#ty;
-show(var#ry);
+var#aa=2+9+7+2;
+cmp(1,1){
+show(var#Aa);
+};
+shows(Hello world);
 }

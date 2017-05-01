@@ -174,7 +174,6 @@ char* getMul(){
   return asmString;
 }
 
-<<<<<<< HEAD
 char* getDiv(){
   char* asmString = "\tmovl %edx, 28(%esp)\n";
   asmString = asmConcat(asmString,"\tmovl %eax, 24(%esp)\n");
@@ -193,7 +192,7 @@ char* getMod(){
   asmString = asmConcat(asmString,"\tmovl	%edx, %eax\n");
   return asmString;
 }
-=======
+
 char* getCmpCode1(){
   char tmp[10];
   sprintf(tmp, "%d", JumpNum);
@@ -214,4 +213,3 @@ char* getCmpCode2(){
   JumpNum++;
   return asmString;
 }
->>>>>>> origin/paoo
