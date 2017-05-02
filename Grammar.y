@@ -55,7 +55,7 @@ val                 {
   $$ = $2;
 }
 | exp '+' exp       {
-  printf("Plus\n");
+  printf("Plus %d\n",counter);
   asmCode = asmConcat(asmCode,getAdd(counter));
   counter--;
   $$ = "%eax";
@@ -117,8 +117,9 @@ DEC                 {
 command:
 show
 | REG '=' exp       {
-  printf("Assign : %d\n",$1);
+  printf("Assign %d\n",counter);
   asmCode = asmConcat(asmCode, getAssign($1,$3));
+  counter = 0;
 }
 | showh
 | shows
@@ -152,7 +153,7 @@ SHOWS '(' ST ')' {
 
 
 cmp:
-CMP conditionCmp statementCmp { printf("CMP\n");}
+CMP conditionCmp statementCmp { printf("Cmp:\n");}
 ;
 
 
@@ -174,7 +175,7 @@ statementCmp:
 
 
 loop:
-LOOP conditionLoop statementLoop  { printf("LOOP\n");}
+LOOP conditionLoop statementLoop  { printf("Loop:\n");}
 
 
 conditionLoop:
@@ -182,16 +183,19 @@ conditionLoop:
   asmCode = asmConcat(asmCode,getSetValue($2,1));
   asmCode = asmConcat(asmCode,getSetValue($4,2));
   asmCode = asmConcat(asmCode,getLoopCodeAdd($7));
+  counter = 0;
 }
 | '(' val ',' val ',' '-' val ')' {
   asmCode = asmConcat(asmCode,getSetValue($2,1));
   asmCode = asmConcat(asmCode,getSetValue($4,2));
   asmCode = asmConcat(asmCode,getLoopCodeSub($7));
+  counter = 0;
 }
 | '(' val ',' val ',' '*' val ')' {
   asmCode = asmConcat(asmCode,getSetValue($2,1));
   asmCode = asmConcat(asmCode,getSetValue($4,2));
   asmCode = asmConcat(asmCode,getLoopCodeMultiple($7));
+  counter = 0;
 }
 ;
 

@@ -1,5 +1,6 @@
 {
-var#aa=-1+5%9+(-4+12)*5;
-show(var#Aa);
-shows(Hello world);
+var#ab=4;
+var#bb=1;
+var#cc=var#ab+var#bb;
+show(var#cc);
 }
