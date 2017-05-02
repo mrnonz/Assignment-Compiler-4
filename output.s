@@ -17,18 +17,10 @@ LFB10:
 	movl $4, %eax
 	movl %eax, 52(%esp)
 	movl $4, 104(%esp)
-	movl $1, %eax
-	movl %eax, 52(%esp)
-	movl $1, 208(%esp)
 	movl 104(%esp), %eax
+	neg %eax
 	movl %eax, 52(%esp)
-	movl 208(%esp), %eax
-	movl %eax, 56(%esp)
-	movl 52(%esp), %eax
-	movl 56(%esp), %edx
-	addl	%edx, %eax
-	movl %eax, 52(%esp)
-	movl %eax, 316(%esp)
+	movl 104(%esp), 316(%esp)
 	movl	316(%esp), %eax
 	movl	%eax, 4(%esp)
 	movl	$LC0, (%esp)

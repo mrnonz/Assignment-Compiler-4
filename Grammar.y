@@ -52,7 +52,7 @@ val                 {
 | '-' val           {
   asmCode = asmConcat(asmCode,getSetNegTmp($2,counter));
   counter++;
-  $$ = $2;
+  $$ = "%eax";
 }
 | exp '+' exp       {
   printf("Plus %d\n",counter);
