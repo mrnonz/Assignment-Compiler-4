@@ -16,25 +16,46 @@ LFB10:
 	andl	$-16, %esp
 	subl	$2804, %esp
 	call	___main
-	movl	$2, %edx
-	movl	$9, %eax
+	movl $1, %eax
+	neg %eax
+	movl %eax, 52(%esp)
+	movl $5, %eax
+	movl %eax, 56(%esp)
+	movl $9, %eax
+	movl %eax, 60(%esp)
+	movl 56(%esp), %eax
+	cltd
+	idivl	60(%esp)
+	movl %edx, 56(%esp)
+	movl %edx, %eax
+	movl 52(%esp), %eax
+	movl 56(%esp), %edx
 	addl	%edx, %eax
-	movl	%eax, %edx
-	movl	$7, %eax
+	movl %eax, 52(%esp)
+	movl $4, %eax
+	neg %eax
+	movl %eax, 56(%esp)
+	movl $12, %eax
+	movl %eax, 60(%esp)
+	movl 56(%esp), %eax
+	movl 60(%esp), %edx
 	addl	%edx, %eax
-	movl	%eax, %edx
-	movl	$2, %eax
+	movl %eax, 56(%esp)
+	movl $5, %eax
+	movl %eax, 60(%esp)
+	movl 56(%esp), %eax
+	movl 60(%esp), %edx
+	imul	%edx, %eax
+	movl %eax, 56(%esp)
+	movl 52(%esp), %eax
+	movl 56(%esp), %edx
 	addl	%edx, %eax
+	movl %eax, 52(%esp)
 	movl %eax, 100(%esp)
-	movl	$1, %edx
-	movl	$1, %eax
-	cmp		%eax, %edx
-	jne		nxt0
 	movl	100(%esp), %eax
 	movl	%eax, 4(%esp)
 	movl	$LC0, (%esp)
 	call	_printf
-	nxt0:
 	movl	$LC1, (%esp)
 	call	_puts
 	nop

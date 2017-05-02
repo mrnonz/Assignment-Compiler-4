@@ -9,6 +9,7 @@
   int tmp1;
   int tmp2;
   int acc;
+  int counter;
 
   char* asmHead="";
   char* asmCode="";
@@ -38,45 +39,49 @@ input: line input
   	;
 
 line: '\n'
-  	| exp ';'
+  	| exp ';' { counter = 0; }
     | command ';'
   	;
 
 exp:
-val                 { $$ = $1; }
+val                 {
+  asmCode = asmConcat(asmCode,getSetTmp($1,counter));
+  counter++;
+  $$ = $1;
+}
+| '-' val           {
+  asmCode = asmConcat(asmCode,getSetNegTmp($2,counter));
+  counter++;
+  $$ = $2;
+}
 | exp '+' exp       {
-  printf("Plus: %s + %s\n",$1,$3);
-  asmCode = asmConcat(asmCode,getSetValue($1,1));
-  asmCode = asmConcat(asmCode,getSetValue($3,2));
-  asmCode = asmConcat(asmCode,getAdd());
+  printf("Plus\n");
+  asmCode = asmConcat(asmCode,getAdd(counter));
+  counter--;
   $$ = "%eax";
 }
 | exp '-' exp       {
-  printf("Sub: %s - %s\n",$1,$3);
-  asmCode = asmConcat(asmCode,getSetValue($1,1));
-  asmCode = asmConcat(asmCode,getSetValue($3,2));
-  asmCode = asmConcat(asmCode,getSub());
+  printf("Sub\n");
+  asmCode = asmConcat(asmCode,getSub(counter));
+  counter--;
   $$ = "%eax";
 }
 | exp '*' exp       {
-  printf("Mul: %s * %s\n",$1,$3);
-  asmCode = asmConcat(asmCode,getSetValue($1,1));
-  asmCode = asmConcat(asmCode,getSetValue($3,2));
-  asmCode = asmConcat(asmCode,getMul());
+  printf("Mul\n");
+  asmCode = asmConcat(asmCode,getMul(counter));
+  counter--;
   $$ = "%eax";
 }
 | exp '/' exp       {
-  printf("Div: %s / %s\n",$1,$3);
-  asmCode = asmConcat(asmCode,getSetValue($1,1));
-  asmCode = asmConcat(asmCode,getSetValue($3,2));
-  asmCode = asmConcat(asmCode,getDiv());
+  printf("Div\n");
+  asmCode = asmConcat(asmCode,getDiv(counter));
+  counter--;
   $$ = "%eax";
 }
 | exp '%' exp       {
-  printf("Mod: %s %% %s\n",$1,$3);
-  asmCode = asmConcat(asmCode,getSetValue($1,1));
-  asmCode = asmConcat(asmCode,getSetValue($3,2));
-  asmCode = asmConcat(asmCode,getMod());
+  printf("Mod\n");
+  asmCode = asmConcat(asmCode,getMod(counter));
+  counter--;
   $$ = "%eax";
 }
 | '(' exp ')'       {
@@ -95,6 +100,7 @@ DEC                 {
 | HEX               {
   char* tmp;
   sprintf(tmp,"$%d",$1);
+  printf("HEX : %d\n",tmp);
   $$ = "";
   $$ = asmConcat($$,tmp);
 }
@@ -203,7 +209,7 @@ int main (void)
 {
   int i;
   FILE *fp = fopen("output.s","wb+");
-
+  counter = 0;
   yyparse ();
   asmHead = asmConcat(asmHead,getMain());
   asmCode = asmConcat(asmCode,getTail());

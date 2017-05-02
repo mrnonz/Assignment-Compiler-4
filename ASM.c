@@ -11,12 +11,14 @@ char* getShowHexCode(int);
 char* getShowHexHead();
 char* getShowStringCode();
 char* getShowStringHead(char*);
+char* getSetTmp(char*, int);
+char* getSetNegTmp(char*, int);
 char* getSetValue(char*,int);
-char* getAdd();
-char* getSub();
-char* getMul();
-char* getDiv();
-char* getMod();
+char* getAdd(int);
+char* getSub(int);
+char* getMul(int);
+char* getDiv(int);
+char* getMod(int);
 char* asmConcat(char*,char*);
 char* getCmpCodeStart();
 char* getCmpCodeEnd();
@@ -24,6 +26,10 @@ char* getLoopCodeAdd(char*);
 char* getLoopCodeSub(char*);
 char* getLoopCodeMultiple(char*);
 char* getLoopCodeEnd();
+char* asmConcatNoFree(char*,char*);
+char* getCmpCode1();
+char* getCmpCode2();
+
 
 int HeaderNum = 0;
 int JumpNum = 0;
@@ -36,6 +42,14 @@ char* asmConcat(char* base,char* cc){
   strcat(tmpStr,cc);
   free(base);
   free(cc);
+  return tmpStr;
+}
+
+char* asmConcatNoFree(char* base,char* cc){
+  char* tmpStr = malloc(strlen(base) + strlen(cc) + 1);
+  strcpy(tmpStr,base);
+  strcat(tmpStr,cc);
+  free(base);
   return tmpStr;
 }
 
@@ -153,6 +167,35 @@ char* getTail(){
   return asmString;
 }
 
+char* getSetTmp(char* val, int counter){
+  char* asmString = "\tmovl ";
+  asmString = asmConcatNoFree(asmString, val);
+  asmString = asmConcat(asmString, ", %eax\n");
+  if(counter == 0){
+    asmString = asmConcat(asmString,"\tmovl %eax, 52(%esp)\n");
+  }else if(counter == 1){
+    asmString = asmConcat(asmString,"\tmovl %eax, 56(%esp)\n");
+  }else if(counter == 2){
+    asmString = asmConcat(asmString,"\tmovl %eax, 60(%esp)\n");
+  }
+  return asmString;
+}
+
+char* getSetNegTmp(char* val, int counter){
+  char* asmString = "\tmovl ";
+  asmString = asmConcatNoFree(asmString, val);
+  asmString = asmConcat(asmString, ", %eax\n");
+  asmString = asmConcat(asmString,"\tneg %eax\n");
+  if(counter == 0){
+    asmString = asmConcat(asmString,"\tmovl %eax, 52(%esp)\n");
+  }else if(counter == 1){
+    asmString = asmConcat(asmString,"\tmovl %eax, 56(%esp)\n");
+  }else if(counter == 2){
+    asmString = asmConcat(asmString,"\tmovl %eax, 60(%esp)\n");
+  }
+  return asmString;
+}
+
 char* getSetValue(char* val, int i){
   char* asmString = "\tmovl	";
   if(i == 1){
@@ -165,37 +208,84 @@ char* getSetValue(char* val, int i){
   return asmString;
 }
 
-char* getAdd(){
-  char* asmString = "\taddl	%edx, %eax\n";
+char* getAdd(int counter){
+  char* asmString = "";
+  if(counter == 2){
+    asmString = asmConcat(asmString,"\tmovl 52(%esp), %eax\n");
+    asmString = asmConcat(asmString,"\tmovl 56(%esp), %edx\n");
+    asmString = asmConcat(asmString,"\taddl	%edx, %eax\n");
+    asmString = asmConcat(asmString,"\tmovl %eax, 52(%esp)\n");
+  }else if(counter == 3){
+    asmString = asmConcat(asmString,"\tmovl 56(%esp), %eax\n");
+    asmString = asmConcat(asmString,"\tmovl 60(%esp), %edx\n");
+    asmString = asmConcat(asmString,"\taddl	%edx, %eax\n");
+    asmString = asmConcat(asmString,"\tmovl %eax, 56(%esp)\n");
+  }
   return asmString;
 }
 
-char* getSub(){
-  char* asmString = "\tsubl	%edx, %eax\n";
+char* getSub(int counter){
+  char* asmString = "";
+  if(counter == 2){
+    asmString = asmConcat(asmString,"\tmovl 52(%esp), %eax\n");
+    asmString = asmConcat(asmString,"\tmovl 56(%esp), %edx\n");
+    asmString = asmConcat(asmString,"\tsubl	%edx, %eax\n");
+    asmString = asmConcat(asmString,"\tmovl %eax, 52(%esp)\n");
+  }else if(counter == 3){
+    asmString = asmConcat(asmString,"\tmovl 56(%esp), %eax\n");
+    asmString = asmConcat(asmString,"\tmovl 60(%esp), %edx\n");
+    asmString = asmConcat(asmString,"\tsubl	%edx, %eax\n");
+    asmString = asmConcat(asmString,"\tmovl %eax, 56(%esp)\n");
+  }
   return asmString;
 }
 
-char* getMul(){
-  char* asmString = "\timul	%edx, %eax\n";
+char* getMul(int counter){
+  char* asmString = "";
+  if(counter == 2){
+    asmString = asmConcat(asmString,"\tmovl 52(%esp), %eax\n");
+    asmString = asmConcat(asmString,"\tmovl 56(%esp), %edx\n");
+    asmString = asmConcat(asmString,"\timul	%edx, %eax\n");
+    asmString = asmConcat(asmString,"\tmovl %eax, 52(%esp)\n");
+  }else if(counter == 3){
+    asmString = asmConcat(asmString,"\tmovl 56(%esp), %eax\n");
+    asmString = asmConcat(asmString,"\tmovl 60(%esp), %edx\n");
+    asmString = asmConcat(asmString,"\timul	%edx, %eax\n");
+    asmString = asmConcat(asmString,"\tmovl %eax, 56(%esp)\n");
+  }
   return asmString;
 }
 
-char* getDiv(){
-  char* asmString = "\tmovl %edx, 28(%esp)\n";
-  asmString = asmConcat(asmString,"\tmovl %eax, 24(%esp)\n");
-  asmString = asmConcat(asmString,"\tmovl	28(%esp), %eax\n");
-  asmString = asmConcat(asmString,"\tcltd\n");
-  asmString = asmConcat(asmString,"\tidivl	24(%esp)\n");
+char* getDiv(int counter){
+  char* asmString = "";
+  if(counter == 2){
+    asmString = asmConcat(asmString,"\tmovl 52(%esp), %eax\n");
+    asmString = asmConcat(asmString,"\tcltd\n");
+    asmString = asmConcat(asmString,"\tidivl	56(%esp)\n");
+    asmString = asmConcat(asmString,"\tmovl %eax, 52(%esp)\n");
+  }else if(counter == 3){
+    asmString = asmConcat(asmString,"\tmovl 56(%esp), %eax\n");
+    asmString = asmConcat(asmString,"\tcltd\n");
+    asmString = asmConcat(asmString,"\tidivl	60(%esp)\n");
+    asmString = asmConcat(asmString,"\tmovl %eax, 56(%esp)\n");
+  }
   return asmString;
 }
 
-char* getMod(){
-  char* asmString = "\tmovl %edx, 28(%esp)\n";
-  asmString = asmConcat(asmString,"\tmovl %eax, 24(%esp)\n");
-  asmString = asmConcat(asmString,"\tmovl	28(%esp), %eax\n");
-  asmString = asmConcat(asmString,"\tcltd\n");
-  asmString = asmConcat(asmString,"\tidivl	24(%esp)\n");
-  asmString = asmConcat(asmString,"\tmovl	%edx, %eax\n");
+char* getMod(int counter){
+  char* asmString = "";
+  if(counter == 2){
+    asmString = asmConcat(asmString,"\tmovl 52(%esp), %eax\n");
+    asmString = asmConcat(asmString,"\tcltd\n");
+    asmString = asmConcat(asmString,"\tidivl	56(%esp)\n");
+    asmString = asmConcat(asmString,"\tmovl %edx, 52(%esp)\n");
+  }else if(counter == 3){
+    asmString = asmConcat(asmString,"\tmovl 56(%esp), %eax\n");
+    asmString = asmConcat(asmString,"\tcltd\n");
+    asmString = asmConcat(asmString,"\tidivl	60(%esp)\n");
+    asmString = asmConcat(asmString,"\tmovl %edx, 56(%esp)\n");
+  }
+  asmString = asmConcat(asmString,"\tmovl %edx, %eax\n");
   return asmString;
 }
 
