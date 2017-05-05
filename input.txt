@@ -1,5 +1,19 @@
 {
 var#ab=4;
-var#cc=-var#ab;
+var#gf=9;
+var#yy=11;
+var#cc=(-var#ab+6)*(var#yy-var#gf);
 show(var#cc);
+shows(Hello World);
+cmp(var#cc,1){
+shows(First Condition);
+};
+cmp(var#cc,4){
+shows(Second Condition);
+};
+var#OO=1;
+loop(1,10,+2){
+show(var#OO);
+var#OO=var#OO+1;
+};
 }
